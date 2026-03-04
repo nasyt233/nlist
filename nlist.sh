@@ -230,7 +230,7 @@ html, body {
     background-position: center;
 }
 body {
-    background: url('$api') fixed;
+    background: url('$api') no-repeat center center fixed;
     font-family: 'Segoe UI', Arial, sans-serif;
     transition: background-color 0.3s, color 0.3s;
 }
@@ -612,12 +612,13 @@ function getIcon(name, isDir) {
     if (isDir) return '📁';
     const ext = name.split('.').pop().toLowerCase();
     const icons = {
-        'zip':'📦', 'rar':'📦', '7z':'📦',
+        'zip':'📦', 'rar':'📦', '7z':'📦', 'gz':'📦',
         'mp4':'🎬', 'mkv':'🎬', 'avi':'🎬',
         'mp3':'🎵', 'flac':'🎵', 'wav':'🎵',
-        'png':'🖼', 'jpg':'🖼', 'jpeg':'🖼', 'gif':'🖼', 'bmp':'🖼',
+        'png':'🖼', 'jpg':'🖼', 'jpeg':'🖼', 'gif':'🖼', 'bmp':'🖼', 'webp':'🖼',
         'pdf':'📕', 'txt':'📄', 'md':'📄',
         'py':'🐍', 'js':'🌐', 'html':'🌐', 'css':'🎨',
+        'rs':'🦀', 'sh':'📜', 'rb':'📜', 'bat':'📜',
     };
     return icons[ext] || '📄';
 }

@@ -1,6 +1,7 @@
-📁 TreeStyle - 精美可折叠目录树生成器
+📁 nlist - 精美可折叠目录树生成器
 
-https://img.shields.io/badge/License-MIT-yellow.svg
+![演示图片](ys.jpg)
+
 
 一个用 Bash 编写的脚本，可将当前目录结构生成为一个精美、可折叠、响应式的 HTML 页面。支持夜间模式、亚克力毛玻璃效果、文件夹优先排序、隐藏文件开关、自动展示 README、文件总数统计等功能，非常适合用作 GitHub 项目的文档首页或本地文件浏览器。
 
@@ -16,8 +17,8 @@ https://img.shields.io/badge/License-MIT-yellow.svg
 - 📖 README 自动嵌入 – 若存在 README.md / README.txt / README，会自动渲染并显示在目录树下方（支持 Markdown 转换，需 pandoc 或 markdown 命令）。
 - 👁️ 隐藏文件开关 – 可通过脚本开头的变量控制是否显示以点开头的隐藏文件。
 - 📱 手机响应式 – 小屏幕下自动调整字体、间距，触摸友好。
-- ⚙️ 可自定义 – 项目名称、简介可在脚本开头修改。
-- 🚀 轻量快速 – 仅依赖 tree 命令，生成速度快。
+- ⚙️ 可自定义 – 项目名称、简介、背景API地址 可在脚本开头修改。
+- 🚀 轻量快速 – 仅依赖 tree 命令，生成速度极快。
 
 ---
 
@@ -35,8 +36,6 @@ https://img.shields.io/badge/License-MIT-yellow.svg
   bash -c "$(curl -L nasyt.hoha.top/shell/nasyt_install.sh)"
   ```
   
-- （可选）pandoc 或 markdown – 用于将 README.md 转换为 HTML。若未安装，README 将以纯文本形式显示在 <pre> 中。
-- （可选）jq – 脚本未直接使用，但若您想手动处理 JSON 可安装。
 
 ---
 
