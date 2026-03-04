@@ -8,7 +8,7 @@ https://img.shields.io/badge/License-MIT-yellow.svg
 
 ✨ 特性
 
-· 🌳 树形目录展示 – 使用 <details> 元素实现原生折叠，支持无限层级。
+· 🌳 树形目录展示 – 使用 details 元素实现原生折叠，支持无限层级。
 · 📁 文件夹优先 – 所有文件夹排在文件前面，同类型按名称字母排序。
 · 🌙 夜间模式 – 一键切换，主题偏好保存在 localStorage 中。
 · 🥃 亚克力效果 – 毛玻璃背景，现代美观。
