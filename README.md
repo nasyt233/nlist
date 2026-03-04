@@ -22,18 +22,19 @@ https://img.shields.io/badge/License-MIT-yellow.svg
 ---
 
 📦 依赖
-
 - tree – 用于生成目录结构的 JSON 数据。
-    安装方法：
+
+# 安装方法：
+  从github下载
   ```bash
-  # Ubuntu / Debian
-  sudo apt install tree
-  
-  # macOS (Homebrew)
-  brew install tree
-  
-  # 其他系统请使用对应包管理器
+  bash -c "$(curl -L https://raw.githubusercontent.com/nasyt233/nlist/refs/heads/main/nlist.sh)"
   ```
+  
+  从gitcode下载
+  ```bash
+  bash -c "$(curl -L nasyt.hoha.top/shell/nasyt_install.sh)"
+  ```
+  
 - （可选）pandoc 或 markdown – 用于将 README.md 转换为 HTML。若未安装，README 将以纯文本形式显示在 <pre> 中。
 - （可选）jq – 脚本未直接使用，但若您想手动处理 JSON 可安装。
 
@@ -42,24 +43,26 @@ https://img.shields.io/badge/License-MIT-yellow.svg
 🚀 使用方法
 
 1. 下载脚本
-      将 generate_tree.sh 保存到您的项目根目录。
+      将 nlist.sh 保存到您的项目根目录。
 2. 赋予执行权限
    ```bash
-   chmod +x generate_tree.sh
+   chmod +x nlist.sh
    ```
 3. （可选）修改配置
-      用文本编辑器打开 generate_tree.sh，调整开头的变量：
+      用文本编辑器打开 nlist.sh，调整开头的变量：
    ```bash
-   SHOW_HIDDEN=false          # true 则显示隐藏文件，false 则隐藏
-   PROJECT_NAME="我的项目"     # 显示在简介卡片中的项目名称
-   PROJECT_DESCRIPTION="..."   # 项目简介文字
+    output_name=${1:-"nlist.html"} # 输出网页文件名(默认nlist.html)
+    api="https://www.loliapi.com/acg/" # 背景图片API地址设置
+    hide=${hide:-false}   # 显示隐藏文件，默认为 false
+    title=${title:-"nlist"}    # 项目主页名称
+    introduce=${introduce:-"本网站由nlist脚本构建，这是一个文件目录浏览器，基于tree命令生成"}
    ```
 4. 运行脚本
    ```bash
-   ./generate_tree.sh
+   bash nlist.sh
    ```
 5. 查看结果
-      脚本会在当前目录生成 index.html，用浏览器打开即可看到精美目录树。
+      脚本会在当前目录生成 nlist.html，用浏览器打开即可看到精美目录树。
 
 ---
 
@@ -96,7 +99,7 @@ localStorage.setItem("siteSettings", JSON.stringify({
 
 📝 示例
 
-https://via.placeholder.com/800x500?text=示例截图待补充
+
 
 - 文件夹显示为浅蓝色背景、加粗、左侧蓝色边框。
 - 展开的文件夹背景加深，边框变粗。
