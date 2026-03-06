@@ -6,14 +6,30 @@
 # 原理是通过tree命令高速扫描并输出json文件结构
 # 并用JavaScript读取json文件进行展示
 
+version=1.1
+
+br() {
+    echo -e "\e[1;34m----------------------------\e[0m"
+}
+
+if [[ $1 = *help ]]; then
+    echo
+    echo "使用方法"
+    echo "  nlist [目录] [输出] [简介]"
+    echo "  nlist 直接在当前目录构建并输出nlist.html"
+    echo 
+    exit 1
+fi
 
 
-# ===== 可配置选项 =====
-output_name=${1:-"nlist.html"} # 输出网页文件名(默认nlist.html)
+# ====== 可配置选项 ======
+nlist_dir=${1:-"$PWD"} # 默认选择当前目录扫描。
+output_name=${2:-"nlist.html"} # 输出网页文件名(默认nlist.html)
+
 api="https://www.loliapi.com/acg/" # 背景图片API地址设置
-hide=${hide:-false}   # 显示隐藏文件，默认为 false
+hide=${hide:-false}   # 显示隐藏文件，默认为 false，似乎没啥用。
 title=${title:-"nlist"}    # 项目主页名称
-introduce=${introduce:-"本网站由nlist脚本构建，这是一个文件目录浏览器，基于tree命令生成"}
+introduce=${3:-"本网站由nlist脚本构建，这是一个文件目录浏览器，基于tree命令生成，支持主页REDME文件显示"}
 # ======================
 
 
@@ -183,13 +199,23 @@ fi
 test_install tree
 
 echo -e "$(info) $blue 正在扫描目录结构中...$color"
+
+echo "$nlist_dir"
+
 # 生成 JSON 树，根据 hide 决定是否排除隐藏文件
-TREE_JSON=$(eval tree -J $TREE_EXCLUDE --noreport "$PWD")
-DIR_NAME=$(basename "$PWD")
+TREE_JSON=$(eval tree -J $TREE_EXCLUDE --noreport "$nlist_dir")
+if [ $? -ne 0 ]; then
+    echo -e "$(info) $red 扫描出现错误，所选的文件夹可能不存在。$color"
+    exit 1
+fi
+
+echo -e "$(info) $green 目录扫描完成$color"
+
+DIR_NAME=$(basename "$nlist_dir")
 
 # ===== 处理 README 文件 =====
 README_HTML=""
-for readme_file in "README.md" "README.txt" "README"; do
+for readme_file in "$nlist_dir/README.md" "$nlist_dir/README.txt" "$nlist_dir/README"; do
     if [[ -f "$readme_file" ]]; then
         echo -e "$(info) 发现 README 文件: $readme_file"
         if [[ "$readme_file" == *.md ]]; then
@@ -201,6 +227,7 @@ for readme_file in "README.md" "README.txt" "README"; do
                 README_HTML="<pre>$(cat "$readme_file")</pre>"
             fi
         else
+            echo -e "$(info) 推荐安装pandoc或者markdown软件包，以获得最佳体验。"
             README_HTML="<pre>$(cat "$readme_file")</pre>"
         fi
         README_HTML="
@@ -766,11 +793,14 @@ themeToggle.addEventListener('click', () => {
 </html>
 EOF
 
+# 移动文件到对应目录。
+cp $output_name $nlist_dir
+
 # ========== 完成提示 ==========
 if [[ "$hide" == "true" ]]; then
     echo -e "$(info) $green 生成完成（包含隐藏文件）：$color"
 else
     echo -e "$(info) $green 生成完成（已排除隐藏文件）：$color"
 fi
-echo -e "$blue $PWD/$output_name $color"
+echo -e "$blue $nlist_dir/$output_name $color"
 echo -e "$(info) 推荐使用nweb运行"
