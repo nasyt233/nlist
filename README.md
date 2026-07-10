@@ -25,15 +25,20 @@ https://img.shields.io/badge/License-MIT-yellow.svg
 - tree – 用于生成目录结构的 JSON 数据。
 
 # 安装方法：
-  从github下载
-  ```bash
-  bash -c "$(curl -L https://raw.githubusercontent.com/nasyt233/nlist/refs/heads/main/nlist.sh)"
-  ```
-  
-  从gitcode下载
-  ```bash
-  bash -c "$(curl -L nasyt.hoha.top/shell/nasyt_install.sh)"
-  ```
+    通用管理脚本
+    ```
+    bash -c "$(curl -L nasyt.hoha.top/shell/nasyt_install.sh)"
+    ```
+    
+    从github下载
+    ```bash
+    curl -o nlist.sh https://raw.githubusercontent.com/nasyt233/nlist/refs/heads/main/nlist.sh
+    ```
+    
+    从gitcode下载
+    ```bash
+    curl -o nlist.sh https://raw.gitcode.com/nasyt/nlist/raw/main/nlist.sh
+    ```
   
 
 ---
@@ -47,17 +52,20 @@ https://img.shields.io/badge/License-MIT-yellow.svg
    chmod +x nlist.sh
    ```
 3. （可选）修改配置
-      用文本编辑器打开 nlist.sh，调整开头的变量：
+   用文本编辑器打开 nlist.sh，调整开头的变量：
    ```bash
-    output_name=${1:-"nlist.html"} # 输出网页文件名(默认nlist.html)
-    api="https://www.loliapi.com/acg/" # 背景图片API地址设置
-    hide=${hide:-false}   # 显示隐藏文件，默认为 false
-    title=${title:-"nlist"}    # 项目主页名称
-    introduce=${introduce:-"本网站由nlist脚本构建，这是一个文件目录浏览器，基于tree命令生成"}
+    nlist_dir=${1:-"$PWD"}              # 默认选择当前目录扫描。
+    output_name=${2:-"nlist.html"}      # 输出网页文件名(默认nlist.html)
+    tmd="0.3"                           # 背景透明度(越小越透明)
+    mh="5px"                            # 背景模糊程度(越大越模糊)
+    api="https://www.loliapi.com/acg/"  # 背景图片API地址设置
+    hide=${hide:-false}                 # 显示隐藏文件，默认为 false，似乎没啥用。
+    title=${title:-"nlist"}             # 项目主页名称
+    introduce=${3:-"本网站由nlist脚本构建，这是一个文件目录浏览器，基于tree命令生成，支持主页REDME文件显示"}
    ```
 4. 运行脚本
    ```bash
-   bash nlist.sh
+   bash nlist.sh [目录]
    ```
 5. 查看结果
       脚本会在当前目录生成 nlist.html，用浏览器打开即可看到精美目录树。
