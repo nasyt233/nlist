@@ -1,9 +1,8 @@
-## 📁 nlist - 精美可折叠目录树生成器
+📁 nlist - 精美可折叠目录树生成器
 
-![演示图片](ys.jpg)
+https://img.shields.io/badge/License-MIT-yellow.svg
 
-
-一个用 `Bash` 编写的脚本，可将当前目录结构生成为一个精美、可折叠、响应式的 HTML 页面。支持夜间模式、亚克力毛玻璃效果、文件夹优先排序、隐藏文件开关、自动展示 README、文件总数统计等功能，非常适合用作 GitHub 项目的文档首页或本地文件浏览器。
+一个用 Bash 编写的脚本，可将当前目录结构生成为一个精美、可折叠、响应式的 HTML 页面。支持夜间模式、亚克力毛玻璃效果、文件夹优先排序、隐藏文件开关、自动展示 README、文件总数统计等功能，非常适合用作 GitHub 项目的文档首页或本地文件浏览器。
 
 ---
 
@@ -17,7 +16,7 @@
 - 📖 README 自动嵌入 – 若存在 README.md / README.txt / README，会自动渲染并显示在目录树下方（支持 Markdown 转换，需 pandoc 或 markdown 命令）。
 - 👁️ 隐藏文件开关 – 可通过脚本开头的变量控制是否显示以点开头的隐藏文件。
 - 📱 手机响应式 – 小屏幕下自动调整字体、间距，触摸友好。
-- ⚙️ 可自定义 – 项目名称、简介、背景API地址 可在脚本开头修改。
+- ⚙️ 可自定义 – 项目名称、简介、背景API地址、透明度、模糊程度 可在脚本开头修改。
 - 🚀 轻量快速 – 仅依赖 tree 命令，生成速度极快。
 
 ---
@@ -25,28 +24,29 @@
 📦 依赖
 - tree – 用于生成目录结构的 JSON 数据。
 
-
-# 🚀 使用方法
-
+# 安装方法：
   从github下载
   ```bash
-  curl -o nlist.sh https://raw.githubusercontent.com/nasyt233/nlist/refs/heads/main/nlist.sh
+  bash -c "$(curl -L https://raw.githubusercontent.com/nasyt233/nlist/refs/heads/main/nlist.sh)"
   ```
   
   从gitcode下载
   ```bash
-  curl -o nlist.sh https://raw.gitcode.com/nasyt/nlist/raw/main/nlist.sh
+  bash -c "$(curl -L nasyt.hoha.top/shell/nasyt_install.sh)"
   ```
   
-  直接在线运行
-  ```bash
-  bash -c "$(curl -L https://raw.gitcode.com/nasyt/nlist/raw/main/nlist.sh)"
-  ```
-  
+
 ---
 
+🚀 使用方法
 
-# 修改配置(可选)
+1. 下载脚本
+      将 nlist.sh 保存到您的项目根目录。
+2. 赋予执行权限
+   ```bash
+   chmod +x nlist.sh
+   ```
+3. （可选）修改配置
       用文本编辑器打开 nlist.sh，调整开头的变量：
    ```bash
     output_name=${1:-"nlist.html"} # 输出网页文件名(默认nlist.html)
@@ -55,16 +55,29 @@
     title=${title:-"nlist"}    # 项目主页名称
     introduce=${introduce:-"本网站由nlist脚本构建，这是一个文件目录浏览器，基于tree命令生成"}
    ```
-# 运行脚本
+4. 运行脚本
    ```bash
    bash nlist.sh
    ```
-# 查看输出结果
+5. 查看结果
       脚本会在当前目录生成 nlist.html，用浏览器打开即可看到精美目录树。
-      推荐使用nweb项目进行运行
 
 ---
 
+⚙️ 配置选项详解
+
+变量名 默认值 说明
+SHOW_HIDDEN false 是否在目录树中显示以点开头的隐藏文件和目录。
+PROJECT_NAME "我的项目" 页面顶部项目简介卡片中的标题。
+PROJECT_DESCRIPTION "这是一个文件目录浏览器..." 项目简介的详细描述。
+
+您也可以在执行时通过环境变量覆盖，例如：
+
+```bash
+SHOW_HIDDEN=true PROJECT_NAME="My Awesome Project" ./generate_tree.sh
+```
+
+---
 
 🧩 自定义样式
 

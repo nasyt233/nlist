@@ -5,32 +5,23 @@
 # 群号:610699712
 # 原理是通过tree命令高速扫描并输出json文件结构
 # 并用JavaScript读取json文件进行展示
+nasyt_dir=$HOME/.nasyt
+version=1.2
 
-version=1.1
-
-br() {
-    echo -e "\e[1;34m----------------------------\e[0m"
-}
-
-if [[ $1 = *help ]]; then
-    echo
-    echo "使用方法"
-    echo "  nlist [目录] [输出] [简介]"
-    echo "  nlist 直接在当前目录构建并输出nlist.html"
-    echo 
-    exit 1
-fi
 
 
 # ====== 可配置选项 ======
-nlist_dir=${1:-"$PWD"} # 默认选择当前目录扫描。
-output_name=${2:-"nlist.html"} # 输出网页文件名(默认nlist.html)
-
-api="https://www.loliapi.com/acg/" # 背景图片API地址设置
-hide=${hide:-false}   # 显示隐藏文件，默认为 false，似乎没啥用。
-title=${title:-"nlist"}    # 项目主页名称
+nlist_dir=${1:-"$PWD"}              # 默认选择当前目录扫描。
+output_name=${2:-"nlist.html"}      # 输出网页文件名(默认nlist.html)
+tmd="0.3"                           # 背景透明度(越小越透明)
+mh="5px"                            # 背景模糊程度(越大越模糊)
+api="https://www.loliapi.com/acg/"  # 背景图片API地址设置
+hide=${hide:-false}                 # 显示隐藏文件，默认为 false，似乎没啥用。
+title=${title:-"nlist"}             # 项目主页名称
 introduce=${3:-"本网站由nlist脚本构建，这是一个文件目录浏览器，基于tree命令生成，支持主页REDME文件显示"}
 # ======================
+
+
 
 
 
@@ -48,78 +39,90 @@ check_pkg_install() {
     if [ -f /etc/os-release ]; then
         source /etc/os-release #加载变量
     fi
-    if [[ -z $PRETTY_NAME ]]; then
+    if [[ -n $TERMUX_VERSION ]]; then
         sys="(Termux 终端)"
-        PRETTY_NAME="Termux终端"
+        PRETTY_NAME="Termux"
         sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/termux-packages-24 stable main@' $PREFIX/etc/apt/sources.list >/dev/null
         pkg_install="pkg install"
         pkg_remove="pkg remove"
         pkg_update="pkg update"
         deb_sys="pkg"
         yes_tg="-y"
-        
-        termux-toast "欢迎使用NAS油条termux脚本" &
+        deb_size="$(dpkg -l | wc -l)" >/dev/null 2>&1
+        if [[ $language == "China" ]]; then
+            termux-toast "欢迎使用NAS油条termux脚本" >/dev/null 2>&1
+        else
+            termux-toast "Welcome to the NAS Youtiao termux script" >/dev/null 2>&1
+        fi
         
     elif command -v apt-get >/dev/null 2>&1; then
         sys="(Debian/Ubuntu 系列)"
-        pkg_install="sudo apt install"
-        pkg_remove="sudo apt remove"
-        pkg_update="sudo apt update"
+        pkg_install="apt install"
+        pkg_remove="apt remove"
+        pkg_update="apt update"
         sudo_setup="sudo"
         deb_sys="apt"
         yes_tg="-y"
+        deb_size="$(dpkg -l | wc -l)" >/dev/null 2>&1
         
     elif command -v dnf >/dev/null 2>&1; then
         sys="(Fedora/RHEL/CentOS 8 及更高版本)"
-        pkg_install="sudo dnf install"
-        pkg_remove="sudo dnf remove"
-        pkg_update="sudo dnf update"
+        pkg_install="dnf install"
+        pkg_remove="dnf remove"
+        pkg_update="dnf update"
         sudo_setup="sudo"
         deb_sys="dnf"
         yes_tg="-y"
+        deb_size="$(rpm -qa | wc -l)" >/dev/null 2>&1
         
     elif command -v yum >/dev/null 2>&1; then
         sys="(Fedora/RHEL/Rocky/CentOS 7 及更早版本)"
-        pkg_install="sudo yum install"
-        pkg_remove="sudo yum remove"
-        pkg_update="sudo yum update"
+        pkg_install="yum install"
+        pkg_remove="yum remove"
+        pkg_update="yum update"
         sudo_setup="sudo"
         deb_sys="yum"
         yes_tg="-y"
+        deb_size="$(rpm -qa | wc -l)" >/dev/null 2>&1
         
     elif command -v pacman >/dev/null 2>&1; then
         sys="(Arch Linux 系列)"
-        pkg_install="sudo pacman -S"
-        pkg_remove="sudo pacman -R"
-        pkg_update="sudo pacman -Syu"
+        pkg_install="pacman -S"
+        pkg_remove="pacman -R"
+        pkg_update="pacman -Syu"
         sudo_setup="sudo"
         deb_sys="pacman"
         yes_tg="-y"
+        deb_size="$(pacman -Q | wc -l)" >/dev/null 2>&1
         
     elif command -v zypper >/dev/null 2>&1; then
         sys="(openSUSE 系列)"
-        pkg_install="sudo zypper in -y"
-        pkg_remove="sudo zypper rm"
+        pkg_install="zypper in -y"
+        pkg_remove="zypper rm"
         sudo_setup="sudo"
         deb_sys="zypper"
         yes_tg="-y"
+        deb_size="$(zypper se -i | wc -l)" >/dev/null 2>&1
         
     elif command -v apk >/dev/null 2>&1; then
         sys="(Alpine/PostmarketOS系统)"
         sed -i 's#https\?://dl-cdn.alpinelinux.org/alpine#https://mirrors.tuna.tsinghua.edu.cn/alpine#g' /etc/apk/repositories
-        pkg_install="sudo apk add"
-        pkg_remove="sudo apk del"
+        pkg_install="apk add"
+        pkg_remove="apk del"
+        pkg_update="apk update"
         sudo_setup="sudo"
         deb_sys="apk"
         yes_tg=""
+        deb_size="$(apk info | wc -l)" >/dev/null 2>&1
         
     elif command -v emerge >/dev/null 2>&1; then
         sys="(gentoo/funtoo 系统)"
-        pkg_install="sudo emerge -avk"
-        pkg_remove="sudo emerge -C"
+        pkg_install="emerge -avk"
+        pkg_remove="emerge -C"
         sudo_setup="sudo"
         deb_sys="emerge"
         yes_tg="-y"
+        deb_size="$(qlist -I | wc -l)" >/dev/null 2>&1
         
     elif [[ "$(uname -s)" == "Darwin" ]]; then
         brew_install #brew安装检测
@@ -128,13 +131,14 @@ check_pkg_install() {
         sudo_setup="sudo"
         deb_sys="brew"
         yes_tg="-y"
+        deb_size="$(brew list | wc -l)" >/dev/null 2>&1
         read -p "抱歉，目前没有完全适配MacOS系统"
         
     else
         echo -e "$(info) >_<未检测到支持的系统。"
     fi
-    echo -e "操作系统: $green $PRETTY_NAME $color"
 }
+
 
 #通用安装函数
 test_install() {
@@ -142,17 +146,22 @@ test_install() {
         echo -e "$(info) $green $*已安装,跳过安装$color"
     else
         echo -e "$(info) 正在安装$*"
-        $sudo_setup $pkg_install $* $yes_tg
+        if command -v eatmydata >/dev/null 2>&1; then
+            eatmydata_setup=eatmydata
+        fi
+        $sudo_setup $eatmydata_setup $pkg_install $* $yes_tg
         install_error=$?
         if [ $install_error -ne 0 ]; then
             echo -e "$(info) $red $*安装失败。$color"
-            echo -e "$(info) 正在更新软件包"
-            $pkg_update $yes_tg
+            echo -e "$(info) $red 错误代码$install_error $color"
+            echo -e "$(info) 正在尝试更新软件包"
+            $sudo_setup $pkg_update $yes_tg
             if [ $? -ne 0 ]; then
                 echo -e "$(info) $red 更新软件包失败$color"
+                esc
             else
                 echo -e "$(info) $green 更新软件包成功,正在尝试重新安装。$color"
-                $sudo_setup $pkg_install $* $yes_tg
+                $sudo_setup $eatmydata_setup $pkg_install $* $yes_tg
             fi
         else
             echo -e "$(info) $green $*安装成功。$color"
@@ -187,7 +196,12 @@ esc() {
 echo
 br
 check_pkg_install #系统检测
+br() {
+    echo -e "\e[1;34m----------------------------\e[0m"
+}
 
+
+main() {
 # 根据 hide 决定 tree 的排除参数
 if [[ "$hide" == "true" ]]; then
     TREE_EXCLUDE=""
@@ -253,22 +267,25 @@ html, body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    no-repeat center;
     background-size: cover;
     background-position: center;
 }
 body {
     background: url('$api') no-repeat center center fixed;
+    background-size: cover;
+    background-position: center;
     font-family: 'Segoe UI', Arial, sans-serif;
     transition: background-color 0.3s, color 0.3s;
 }
 .container {
     max-width: 900px;
     margin: 20px auto;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, $tmd);
     border-radius: 15px;
     padding: 30px;
     box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    backdrop-filter: blur(15px) saturate(180%);
+    backdrop-filter: blur('$mh') saturate(180%);
     -webkit-backdrop-filter: blur(15px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.3);
     transition: background 0.3s, backdrop-filter 0.3s;
@@ -804,3 +821,38 @@ else
 fi
 echo -e "$blue $nlist_dir/$output_name $color"
 echo -e "$(info) 推荐使用nweb运行"
+}
+
+
+
+case $1 in
+    u|update|-u|--update)
+        echo -e "$(info) 正在下载或更新脚本文件"
+        curl --progress-bar -o $nasyt_dir/nlist "https://raw.gitcode.com/nasyt/nlist/raw/main/nlist.sh"
+        cw_test=$?
+        if ! [ $cw_test -ne 0 ]; then
+            echo -e "$(info) $green 脚本下载成功$color"
+            echo -e "$(info) 正在给予权限。"
+            echo -e "$(info) 输入$blue nlist help$color 查看帮助"
+            chmod +x $nasyt_dir/nlist
+            cp $nasyt_dir/nlist /usr/bin >/dev/null 2>&1
+            cp $nasyt_dir/nlist $PREFIX/bin >/dev/null 2>&1
+            chmod +x usr/bin/nlist >/dev/null 2>&1
+            chmod +x $PREFIX/bin/nlist >/dev/null 2>&1
+        else
+            echo -e "$(info) $red 脚本下载失败，请检查你的网络$color"
+        fi
+        exit
+        ;;
+    h|help|-h|--help)
+        echo
+        echo "使用方法"
+        echo "  nlist [目录] [输出] [简介]"
+        echo "  nlist 直接在当前目录构建并输出nlist.html"
+        echo "  nlist -u 更新nlist"
+        echo 
+        exit
+        ;;
+esac
+
+main
